@@ -1,0 +1,224 @@
+.my-container{
+    display: flex;
+}
+
+.sidebar-parent{
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+.sidebar{
+    position: fixed;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+}
+.main{
+    flex: 4;
+}
+.statics{
+    display: flex;
+    gap: 10px;
+    justify-content:center;
+    padding: 5px;
+}
+
+.sidebar .card {
+    width: 100px;
+    height: 80px;
+}
+
+.completed {
+    color: green;
+    background-color: rgba(3, 255, 7, 0.22);
+    box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);}
+.completed:hover{
+    color: white;
+    background-color: green;
+}
+
+.pending {
+    color: red;
+    background-color: rgba(255, 0, 0, 0.15);
+    box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);
+}
+.pending:hover{
+    color: white;
+    background-color: red;
+}
+
+.filter{
+    display: flex;
+    flex-direction: column;
+    margin: 20px 10px;
+    gap:15px
+}
+.filter label{
+    font-size: 14px;
+    color: gray;
+}
+
+
+.main{
+    display: flex;
+    flex-direction: column;
+}
+.inputFormDiv{
+    display: flex;
+    align-items: center;
+}
+.input-card {
+    flex: 9;
+}
+.input-card input{
+    border: none;
+    outline: none;
+    height: 50px;
+    padding-left:10px ;
+}
+.input-card input::placeholder{
+    color: gray;
+}
+
+
+#addBtn{
+    flex: 1;
+    color: #0a53be;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.todoList{
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+
+}
+.todoList li {
+    position: relative;
+    border: 0.5px solid lightgray;
+    padding:5px;
+    margin-bottom: 2px;
+    border-radius: 4px;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+}
+.todoList li .todoTask{
+    padding: 5px;
+}
+.todoTask input{
+    width: 95%;
+    border:none
+}
+.todoTask input:focus{
+    border: 0.5px solid lightgray;
+    border: 2px;
+    border-color: lightskyblue;
+}
+.input-card:focus-within{
+    border-color: skyblue;
+}
+
+.todoList li .bi-pencil{
+    position: absolute;
+    top:5%;
+    right: 1%;
+}
+
+.actions{
+    display: flex;
+    margin: 10px 5px 0px 0px;
+    justify-content: space-between;
+}
+.actions small{
+    display: flex;
+    justify-content: center;
+    align-items: end;
+}
+.action-icons{
+    display: flex;
+    gap: 10px;
+    font-size: 28px;
+}
+.action-icons i{
+    cursor: pointer;
+}
+
+input.highlight{
+    border: 1px solid rgba(12, 99, 228, 0.29) !important;
+    border-radius:2px!important;
+}
+.edit-btns span{
+    cursor: pointer;
+}
+.filter-btns{
+    display: flex;
+    justify-content: space-evenly;
+}
+.filter-btns span{
+    cursor: pointer;
+    font-size: 14px;
+}
+.loader{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 60px;
+    height: 60px;
+}
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column !important;
+}
+
+.btn, input, select, textarea {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+@media only screen and (max-width: 1000px) {
+    .flex-row {
+        display: flex;
+        flex-direction: column !important;
+    }
+    .sidebar{
+        position: relative;
+    }
+}
+
+.infinite-scroller {
+    border: 1px solid #ced4da;
+    max-height: 90vh;
+    overflow: auto;
+}
+
+.sbt {
+    position: absolute;
+    end: 2%;
+    right: 2%;
+}
+
+.bg-purple {
+    background-color: #712cf9;
+    color: #fff;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.pull-right {
+    float: right !important;
+}
+
+.zoom-on-hover:hover {
+    transform: scale(1.5);
+}

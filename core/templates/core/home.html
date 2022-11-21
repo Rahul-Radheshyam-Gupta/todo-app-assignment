@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %} Dev {% endblock title %}
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/toastr.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}">
+</head>
+<body>
+<div class="my-container flex-row">
+    <div class="sidebar-parent">
+        <div class="sidebar">
+            <h3 class="text-center my-3"> Todo App </h3>
+            <div class="statics">
+                <div class="card text-center p-2 pending">
+                    <h2 id="pending_count">0</h2>
+                    <span>Pending</span>
+                </div>
+                <div class="card text-center p-2 completed">
+                    <h2 id="approved_count">0</h2>
+                    <span>Completed</span>
+                </div>
+            </div>
+            <div class="filter">
+                <div class="selectDiv">
+                    <label for="status">Status</label>
+                    <select class="form-control" id="status">
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                    </select>
+                </div>
+                <div class="inputDiv">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" class="form-control" name="start_date" id="start_date">
+                </div>
+                <div class="inputDiv">
+                    <label for="end_date">End Date</label>
+                    <input type="date" class="form-control" name="end_date" id="end_date">
+                </div>
+                <div class="filter-btns">
+                    <span class="badge text-bg-danger" onclick="resetFilter();"> Reset</span>
+                    <span class="badge text-bg-primary" onclick="loadTodosWithFilter()"> Filter</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="main">
+        <div class="inputFormDiv">
+            <div class="card m-3 input-card">
+                <input type="text" id="name" name="name" placeholder="Write your todo..">
+            </div>
+            <span id="addBtn" onclick="addUpdateTask()"> <i class="bi bi-patch-plus"></i> </span>
+        </div>
+
+        <div class="m-2">
+            <h5> Your Todos </h5>
+            <ul class="todoList pt-2" id="todoList">
+                {# tasks will be added here through ajax call #}
+            </ul>
+            <div class="card no-task-div width-100">
+                <h3 class="p-2 text-center">No Tasks!</h3>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="spinner-border text-secondary loader" role="status">
+</div>
+<script src="{% static 'js/jquery.js' %}"></script>
+<script src="{% static 'js/bootstrap.js' %}"></script>
+<script src="{% static 'js/moment_js.js' %}"></script>
+<script src="{% static 'js/toastr.js' %}"></script>
+<script src="{% static 'js/home.js' %}"></script>
+<script>
+    $('.loader').hide();
+    const loadTodosWithFilter = () => {
+        /*
+        This function is called when you click on filter button.
+        It will reload the list of tasks as per set filters.
+         */
+        let start_date = $('#start_date').val();
+        let end_date = $('#end_date').val();
+        let status = $('#status').val();
+        let url = `{% url "home" %}?get_list=True&start_date=${start_date}&end_date=${end_date}&status=${status}`;
+        todoFunction('get', url, {})
+    }
+
+    // Add task on Enter key press
+    $("#name").keypress(function(event) {
+        if (event.which == 13) {
+            event.preventDefault();
+            addUpdateTask()
+        }
+    });
+
+    const addUpdateTask = (task_id='') => {
+        /*
+        This is common function for adding and updating a task.
+        if task_id is not passed then its update action, by default it will perform add action.
+         */
+        let parent_selector = $('.todoTask-' + task_id);
+        let name = task_id ? $('.todoTask-' + task_id+' input').val() : $('#name').val()
+        if (!name) {
+            toastr.error('Please Write Something!', 'Error', {duration: 1000});
+            return false;
+        }
+        let data = {
+            'task_id': task_id,
+            'name': name,
+            'action': task_id ? 'update':'add',
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        }
+        todoFunction('post', '{% url "home" %}', data)
+    }
+
+    const approveTask = (task_id, status = 'Pending') => {
+        /*
+        This function will approve the pending task but approve task it will avoid ajax call and display an error.
+         */
+        if (status === 'Approved') {
+            toastr.error('Already approved!', 'Error', {duration: 1000});
+        } else {
+            let data = {
+                'task_id': task_id,
+                'action': 'approve',
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            }
+            todoFunction('post', '{% url "home" %}', data)
+        }
+    }
+
+    const deleteTask = (task_id) => {
+        /*
+        This function is called when you click on delete icon.
+        It will delete and remove the deleted task from the list of tasks.
+         */
+        let data = {
+            'task_id': task_id,
+            'action': 'delete',
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        }
+        todoFunction('post', '{% url "home" %}', data);
+    }
+
+    const enableEditTask = (task_id) => {
+        /*
+        This function is called when you click on edit icon.
+        It will allow you update your task on the same place with two buttons i.e update & cancel.
+         */
+        cancelEdit();
+        let parent_selector = $('.todoTask-' + task_id);
+        parent_selector.find('input').addClass('highlight');
+        parent_selector.find('input').removeAttr('readonly');
+        parent_selector.find('.edit-btns').show();
+    }
+
+    const resetFilter = () => {
+        /*
+        This function is called when you click on reset button and your filter will be reset to default values.
+         */
+        let today = new Date();
+        let monthIndex = today.getMonth()+1
+        current_month = monthIndex < 10 ? '0' + monthIndex : monthIndex;
+        current_day = today.getDate().length == 1 ? '0' + today.getDate() : today.getDate()
+        current_year = today.getFullYear()
+        current_date = current_year + '-' + current_month + '-' + current_day
+        $('#status').val('Pending').trigger('change');
+        $('#start_date').val(current_date);
+        $('#end_date').val(current_date);
+        loadTodosWithFilter();
+    }
+
+    loadStatic('{% url "home" %}?load_static=true');
+    resetFilter();
+    loadTodosWithFilter();
+</script>
+
+{% block script %}
+{% endblock script %}
+</body>
+</html>
